@@ -1,0 +1,45 @@
+apiVersion: BBSI-PROD
+kind: deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+  
+spec:
+  replicas: 3
+  
+  selector:
+    matchLabels:
+      app: nginx
+  
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: "nginx:1.14.2"
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            
+            httpGet:
+              path: ref-data/management/health/liveness
+              port: 80
+              initialDelaySeconds: 
+              periodSeconds: 20
+              timeoutSeconds: 10
+            
+          readinessProbe:
+            
+            httpGet:
+              path: ref-data/management/health/readiness
+              port: 80
+              initialDelaySeconds: 100
+              periodSeconds: 20
+              timeoutSeconds: 10
+              
+            

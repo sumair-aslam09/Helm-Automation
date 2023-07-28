@@ -1,0 +1,47 @@
+apiVersion: {{ deployment_apiversion }}
+kind: {{ deployment_kind }}
+metadata:
+  name: {{ deployment_name }}
+  labels:
+    app: {{ deployment_app_name_label }}
+  
+spec:
+  replicas: {{ deployment_spec_replicas }}
+  
+  selector:
+    matchLabels:
+      app: {{ deployment_app_name_label }}
+  
+  template:
+    metadata:
+      labels:
+        app: {{ deployment_app_name_label }}
+    spec:
+      containers:
+        - name: {{ deployment_container_name }}
+          image: "{{ deployment_image_name }}"
+          ports:
+            - name: http
+              containerPort: {{ deployment_port }}
+              protocol: TCP
+          livenessProbe:
+            {% if liveness_probe_type %}
+            {{ liveness_probe_type }}:
+              path: {{ liveness_probe_path }}
+              port: {{ liveness_probe_port }}
+              initialDelaySeconds: {{ liveness_probe_initialDelaySeconds }}
+              periodSeconds: {{ readiness_probe_periodSeconds }}
+              timeoutSeconds: {{ readiness_probe_timeoutSeconds }}
+            {% endif %}
+          readinessProbe:
+            {% if readiness_probe_type %}
+            {{ readiness_probe_type }}:
+              path: {{ readiness_probe_path }}
+              port: {{ readiness_probe_port }}
+              initialDelaySeconds: {{ readiness_probe_initialDelaySeconds }}
+              periodSeconds: {{ readiness_probe_periodSeconds }}
+              timeoutSeconds: {{ readiness_probe_timeoutSeconds }}
+              {% if readiness_probe_failureThreshold %}
+              failureThreshold: {{ readiness_probe_failureThreshold }}
+              {% endif %}
+            {% endif %}
